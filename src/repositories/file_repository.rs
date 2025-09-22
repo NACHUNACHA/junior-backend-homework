@@ -5,7 +5,7 @@ use crate::dtos::file_dto::FileResponse;
 pub async fn get_all(pool: &MySqlPool) -> Result<Vec<FileResponse>> {
     query_as!(
         FileResponse,
-        "SELECT id, url, filename, original_name, mime_type, CONVERT(size, UNSIGNED) as size FROM files"
+        "SELECT id, url, filename, original_name, mime_type, size FROM files"
     )
     .fetch_all(pool)
     .await
@@ -21,7 +21,7 @@ pub async fn create(
 ) -> std::result::Result<MySqlRow, Error> {
     query_as!(
         File,
-        "INSERT INTO files (url, filename, original_name, mime_type, size) VALUES (?, ?, ?, ?, CAST(? AS UNSIGNED))",
+        "INSERT INTO files (url, filename, original_name, mime_type, size) VALUES (?, ?, ?, ?, ?)",
         url,
         filename,
         original_name,

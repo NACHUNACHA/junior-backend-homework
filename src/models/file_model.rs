@@ -9,7 +9,7 @@ pub struct File {
     pub filename: String,
     pub original_name: String,
     pub mime_type: Option<String>,
-    pub size: u64,
+    pub size: i64,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }

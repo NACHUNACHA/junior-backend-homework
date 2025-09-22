@@ -7,5 +7,5 @@ pub struct FileResponse {
     pub filename: String,
     pub original_name: String,
     pub mime_type: String,
-    pub size: u64,
+    pub size: i64,
 }
