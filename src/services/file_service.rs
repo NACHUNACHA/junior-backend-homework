@@ -2,6 +2,7 @@ use sqlx::{MySqlPool, Row};
 use crate::repositories::file_repository;
 use uuid::Uuid;
 use std::error::Error;
+use rocket::http::Status;
 use rocket_multipart_form_data::FileField;
 use crate::dtos::file_dto::FileResponse;
 use crate::s3_client;
@@ -13,7 +14,7 @@ pub async fn get_all_files(pool: &MySqlPool) -> Result<Vec<FileResponse>, sqlx::
 pub async fn upload_file(
     pool: &MySqlPool,
     file: &FileField,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<Status, Box<dyn Error>> {
 
     let original_name = file.file_name.clone().unwrap().to_string();
     let mime_type = file.content_type.clone().unwrap().to_string();
@@ -23,10 +24,11 @@ pub async fn upload_file(
     
     let s3_client = s3_client::get_client().await?;
     let bucket_name = std::env::var("AWS_BUCKET_NAME")?;
-
-    println!("{}", bucket_name);
     
     let temp_path = file.path.to_path_buf();
+
+    println!("{:?}", temp_path);
+    
     s3_client::upload(&s3_client, &bucket_name, &unique_filename, &temp_path, &mime_type).await?;
 
     let url = format!("https://{}.s3.amazonaws.com/{}", bucket_name, unique_filename);
@@ -41,5 +43,5 @@ pub async fn upload_file(
         size
     ).await?;
 
-    Ok(())
+    Ok(Status::Created)
 }
